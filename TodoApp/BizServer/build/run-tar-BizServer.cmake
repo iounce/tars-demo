@@ -1,0 +1,7 @@
+EXECUTE_PROCESS(COMMAND /usr/bin/cmake -E echo mkdir -p /root/BizServer/build/tmp/BizServer)
+EXECUTE_PROCESS(COMMAND /usr/bin/cmake -E echo rm -rf /root/BizServer/build/tmp/BizServer)
+EXECUTE_PROCESS(COMMAND /usr/bin/cmake -E make_directory /root/BizServer/build/tmp/BizServer)
+EXECUTE_PROCESS(COMMAND /usr/bin/cmake -E echo copy bin/BizServer /root/BizServer/build/tmp/BizServer/)
+EXECUTE_PROCESS(COMMAND /usr/bin/cmake -E copy bin/BizServer /root/BizServer/build/tmp/BizServer/)
+EXECUTE_PROCESS(COMMAND /usr/bin/cmake -E chdir /root/BizServer/build/tmp/ tar czfv BizServer.tgz BizServer)
+EXECUTE_PROCESS(COMMAND /usr/bin/cmake -E copy_if_different /root/BizServer/build/tmp/BizServer.tgz /root/BizServer/build/BizServer.tgz)

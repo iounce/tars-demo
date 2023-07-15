@@ -1,0 +1,5 @@
+EXECUTE_PROCESS(COMMAND /usr/bin/cmake -E make_directory /home/tarsproto/TodoApp/BizServer)
+EXECUTE_PROCESS(COMMAND /usr/bin/cmake -E echo cp -rf /root/BizServer/src/TodoTarsObj.h /home/tarsproto/TodoApp/BizServer)
+EXECUTE_PROCESS(COMMAND /usr/bin/cmake -E copy /root/BizServer/src/TodoTarsObj.h /home/tarsproto/TodoApp/BizServer)
+EXECUTE_PROCESS(COMMAND /usr/bin/cmake -E echo cp -rf /root/BizServer/src/TodoTarsObj.tars /home/tarsproto/TodoApp/BizServer)
+EXECUTE_PROCESS(COMMAND /usr/bin/cmake -E copy /root/BizServer/src/TodoTarsObj.tars /home/tarsproto/TodoApp/BizServer)

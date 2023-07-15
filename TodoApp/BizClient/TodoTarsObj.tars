@@ -1,0 +1,32 @@
+module TodoApp
+{
+
+	struct Todo
+	{
+		1 optional string title;
+		2 optional string content;
+	};
+
+	struct TodoReq
+	{
+		1 optional string seqId;
+		2 optional string userId;
+		3 optional vector<Todo> todoList;
+	};
+
+	struct TodoRsp
+	{
+		1 optional string errCode;
+		2 optional string errMsg;
+		3 optional string seqId;
+		4 optional string userId;
+		5 optional vector<Todo> todoList;
+	};
+
+	interface api
+	{
+		int addTodo(TodoReq req, out TodoRsp rsp);
+		int getTodo(TodoReq req, out TodoRsp rsp);
+	};
+
+};
