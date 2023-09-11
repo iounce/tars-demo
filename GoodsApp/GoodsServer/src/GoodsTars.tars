@@ -1,0 +1,24 @@
+module GoodsApp
+{
+	struct CommonReq
+	{
+		1 optional string seqId;
+        2 optional string cmd;
+		3 optional vector<byte> data;
+	};
+
+	struct CommonRsp
+	{
+		1 optional string errCode;
+		2 optional string errMsg;
+		3 optional string seqId;
+        4 optional int count;
+		5 optional vector<byte> data;
+	};
+
+	interface api
+	{
+		int doCommon(CommonReq req, out CommonRsp rsp);
+	};
+
+};

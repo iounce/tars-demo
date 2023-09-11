@@ -1,0 +1,17 @@
+Command: 100
+Description: 获取商品信息
+
+Groups: [Group1, Group2]
+
+Group1: [Request1]
+Group2: [Request2]
+
+Request1:
+  FuncNo: 100000
+  Input: [section_id, goods_name]
+  Output: [goods_id, goods_label]
+
+Request2:
+  FuncNo: 100001
+  Input: [section_id, goods_id]
+  Output: [section_id, goods_name, goods_price, goods_amount]
