@@ -2,7 +2,7 @@ function data2string(data)
     if type(data) == 'table' then
         return table2string(data)
     elseif type(data) == 'string' then
-        return "\'"..data.."\'"
+        return "\""..data.."\""
     else
         return tostring(data)
     end

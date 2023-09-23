@@ -1,24 +1,25 @@
+
 module GoodsApp
 {
-	struct CommonReq
+    struct DataReq
 	{
 		1 optional string seqId;
         2 optional string cmd;
-		3 optional vector<byte> data;
+		3 optional map<string, string> data;
 	};
 
-	struct CommonRsp
+	struct DataRsp
 	{
 		1 optional string errCode;
 		2 optional string errMsg;
 		3 optional string seqId;
         4 optional int count;
-		5 optional vector<byte> data;
+		5 optional map<string, string> data;
 	};
 
-	interface GoodsTars
-	{
-		int doCommon(CommonReq req, out CommonRsp rsp);
-	};
+    interface DataTars
+    {
+        int doData(DataReq req, out DataRsp rsp);
+    };
 
-};
+}; 

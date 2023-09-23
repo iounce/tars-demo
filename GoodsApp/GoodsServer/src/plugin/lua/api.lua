@@ -1,4 +1,6 @@
-local yaml = require("./YAMLParserLite")
+package.path = package.path .. ";/data/tars/tarsnode-data/GoodsApp.GoodsServer/bin/?.lua"
+
+local yaml = require("YAMLParserLite")
 
 Api = {}
 
@@ -6,7 +8,7 @@ function Api:new(cmd)
     local obj = {}
     
     obj.cmd = cmd
-    obj.file_path = string.format("protocol_%d.yaml", obj.cmd)
+    obj.file_path = "/data/tars/tarsnode-data/GoodsApp.GoodsServer/bin/" .. string.format("protocol_%d.yaml", obj.cmd)
     obj.protocol = ""
     print(obj.cmd)
     print(obj.file_path)

@@ -1,20 +1,20 @@
-﻿#ifndef _GoodsTarsImp_H_
-#define _GoodsTarsImp_H_
+﻿#ifndef _DataTarsImp_H_
+#define _DataTarsImp_H_
 
 #include "servant/Application.h"
-#include "GoodsTars.h"
+#include "DataTars.h"
 
 /**
  *
  *
  */
-class GoodsTarsImp : public GoodsApp::GoodsTars
+class DataTarsImp : public GoodsApp::DataTars
 {
 public:
     /**
      *
      */
-    virtual ~GoodsTarsImp() {}
+    virtual ~DataTarsImp() {}
 
     /**
      *
@@ -29,7 +29,7 @@ public:
     /**
      *
      */
-    virtual tars::Int32 doCommon(const GoodsApp::CommonReq &req, GoodsApp::CommonRsp &rsp, tars::TarsCurrentPtr current);
+    virtual tars::Int32 doData(const GoodsApp::DataReq & req, GoodsApp::DataRsp &rsp, tars::TarsCurrentPtr current);
 };
 /////////////////////////////////////////////////////
 #endif

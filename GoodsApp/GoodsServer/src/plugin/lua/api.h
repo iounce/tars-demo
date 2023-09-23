@@ -1,24 +1,17 @@
-#ifndef __API_
-#define __API_
+#ifndef __API_H
+#define __API_H
 
 #include <string>
 #include <map>
 #include <vector>
 #include <iostream>
-#include <windows.h>
 #include "func.h"
-
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/filewritestream.h"
 
 extern "C"
 {
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
 }
 
 using namespace std;
@@ -52,4 +45,4 @@ private:
     lua_State *m_state;
 };
 
-#endif // __API_
+#endif // __API_H

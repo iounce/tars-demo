@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(GoodsApp-GoodsServer)
+project(GoodsApp-DataServer)
 
 option(TARS_MYSQL "option for mysql" ON)
 option(TARS_SSL "option for ssl" OFF)
@@ -18,12 +18,10 @@ IF (TARS_WEB_HOST STREQUAL "")
 	set(TARS_WEB_HOST "http://tars.test.com")
 ENDIF ()
 
-
 include_directories(/usr/local/tars/cpp/thirdparty/include)
 link_directories(/usr/local/tars/cpp/thirdparty/lib)
 
 #include_directories(/home/tarsprotol/App/OtherServer)
-include_directories(/home/tarsproto/GoodsApp/DataServer)
 
 add_subdirectory(src)
 

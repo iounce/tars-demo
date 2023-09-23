@@ -2,20 +2,18 @@
 #include <map>
 #include <vector>
 #include <iostream>
-#include <windows.h>
 #include "func.h"
-
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/filewritestream.h"
+#include "servant/Application.h"
+#include "util/tc_json.h"
+#include "util/tc_encoder.h"
+#include "util/tc_common.h"
 
 #include "api.h"
+#include "json/json.h"
+#include "json/json_parser.h"
 
 using namespace std;
-using namespace rapidjson;
-
+using namespace tars;
 
 ApiProtocol::ApiProtocol()
 {
@@ -37,37 +35,37 @@ bool ApiProtocol::init(int funcNo)
 
     if (!findModule(getModuleName(funcNo)))
     {
-        cout << "findModule failed" << endl;
+        TLOG_DEBUG("findModule failed" << endl;);
         return false;
     }
 
     if (!findLoadProtocol())
     {
-        cout << "findLoadProtocol failed" << endl;
+        TLOG_DEBUG("findLoadProtocol failed" << endl;);
         return false;
     }
 
     if (!findGetGroups())
     {
-        cout << "findGetGroups failed" << endl;
+        TLOG_DEBUG("findGetGroups failed" << endl;);
         return false;
     }
 
     if (!findGetRequests())
     {
-        cout << "findGetRequests failed" << endl;
+        TLOG_DEBUG("findGetRequests failed" << endl;);
         return false;
     }
 
     if (!findPackRequest())
     {
-        cout << "findPackRequest failed" << endl;
+        TLOG_DEBUG("findPackRequest failed" << endl;);
         return false;
     }
 
     if (!loadProtocol())
     {
-        cout << "loadProtocol failed" << endl;
+        TLOG_DEBUG("loadProtocol failed" << endl;);
         return false;
     }
 
@@ -85,33 +83,24 @@ void ApiProtocol::release()
 
 string ApiProtocol::getModuleName(int funcNo)
 {
-    return string("protocol_") + to_string(funcNo) + string(".lua");
+    //TLOG_DEBUG("exe path: " << TC_File::extractFilePath(TC_File::getExePath()) << endl;);
+    string luaPath = TC_File::extractFilePath(TC_File::getExePath());
+    return luaPath + string("protocol_") + to_string(funcNo) + string(".lua");
 }
 
 bool ApiProtocol::findModule(const string &name)
 {
-    cout << "module: " << name << endl;
-
-    int ret = luaL_loadfile(m_state, name.c_str());
-    if (ret != LUA_OK)
-    {
-        std::string error = lua_tostring(m_state, -1);
-        cout << error << endl;
-
-        cout << "luaL_loadfile failed" << endl;
-
-        return false;
-    }
+    TLOG_DEBUG("module: " << name << endl;);
 
     luaL_openlibs(m_state);
 
-    ret = lua_pcall(m_state, 0, 0, 0);
+    int ret = luaL_dofile(m_state, name.c_str());
     if (ret != LUA_OK)
     {
         std::string error = lua_tostring(m_state, -1);
-        cout << error << endl;
+        TLOG_DEBUG( error << endl;);
 
-        cout << "lua_pcall failed" << endl;
+        TLOG_DEBUG("luaL_dofile failed" << endl;);
 
         return false;
     }
@@ -147,7 +136,7 @@ bool ApiProtocol::loadProtocol()
     if (ret != LUA_OK)
     {
         std::string error = lua_tostring(m_state, -1);
-        cout << ret << "|" << error << endl;
+        TLOG_DEBUG( ret << "|" << error << endl;);
 
         return false;
     }
@@ -170,7 +159,7 @@ bool ApiProtocol::getGroups(string &data)
     if (ret != LUA_OK)
     {
         std::string error = lua_tostring(m_state, -1);
-        cout << error << endl;
+        TLOG_DEBUG( error << endl;);
 
         return false;
     }
@@ -191,22 +180,12 @@ bool ApiProtocol::getGroups(vector<string> &groups)
         return false;
     }
     
-    cout << "groups: " << data << endl;
+    TLOG_DEBUG("getGroups: " << data << endl;);
 
-    Document doc;
+    JsonParser parser(data);
+    parser.getValue("Groups", groups);
 
-    doc.Parse(data.c_str());
-
-    if (!doc.IsArray())
-    {
-        return false;
-    }
-
-    Value &array = doc.GetArray();
-    for (int i = 0; i < array.Size(); i++)
-    {
-        groups.push_back(array[i].GetString());
-    }
+    TLOG_DEBUG("getGroups: " << TC_Common::tostr(groups) << endl;);
 
     return (groups.size() > 0);
 }
@@ -220,7 +199,7 @@ bool ApiProtocol::getRequests(const string &grp_name, string &data)
     if (ret != LUA_OK)
     {
         std::string error = lua_tostring(m_state, -1);
-        cout << error << endl;
+        TLOG_DEBUG( error << endl;);
 
         return false;
     }
@@ -241,22 +220,12 @@ bool ApiProtocol::getRequests(const string &grp_name, vector<string> &requests)
         return false;
     }
 
-    cout << "getRequests: " << grp_name << ":" << data << endl;
+    TLOG_DEBUG("getRequests: " << grp_name << ":" << data << endl;);
 
-    Document doc;
+    JsonParser parser(data);
+    parser.getValue(grp_name, requests);
 
-    doc.Parse(data.c_str());
-
-    if (!doc.IsArray())
-    {
-        return false;
-    }
-
-    Value &array = doc.GetArray();
-    for (int i = 0; i < array.Size(); i++)
-    {
-        requests.push_back(array[i].GetString());
-    }
+    TLOG_DEBUG("getRequests: " << grp_name << "|" << TC_Common::tostr(requests) << endl;);
 
     return (requests.size() > 0);
 }
@@ -279,7 +248,7 @@ string ApiProtocol::packRequest(const string &reqName, const string &clientReq, 
     if (ret != LUA_OK)
     {
         std::string error = lua_tostring(m_state, -1);
-        cout << error << endl;
+        TLOG_DEBUG( error << endl;);
 
         return "";
     }
@@ -291,85 +260,87 @@ string ApiProtocol::packRequest(const string &reqName, const string &clientReq, 
         data = lua_tostring(m_state, -1);
     }
 
-    cout << "packRequest: " << data << endl;
+    TLOG_DEBUG("packRequest: " << TC_Encoder::utf82gbk(data) << endl;);
 
     return data;
 }
 
-string packGetGoodsInfo()
-{
-    map<string, string> req;
-    req["IoSectionId"] = "G0001";
-    req["IoGoodsName"] = "面包";
+// string packGetGoodsInfo()
+// {
+//     map<string, string> req;
+//     req["IoSectionId"] = "G0001";
+//     req["IoGoodsName"] = "面包";
+//     req["IoGoodsId"] = "";
 
-    size_t index = 0;
-    string result = "{";
-    for (auto item : req)
-    {
-        result += "[\"";
-        result += item.first;
-        result += "\"]";
+//     size_t index = 0;
+//     string result = "{";
+//     for (auto item : req)
+//     {
+//         result += "[\"";
+//         result += item.first;
+//         result += "\"]";
 
-        result += "=";
+//         result += "=";
 
-        result += "\"";
-        result += item.second;
-        result += "\"";
+//         result += "\"";
+//         result += item.second;
+//         result += "\"";
 
-        if (index != req.size() - 1)
-        {
-            result += ",";
-        }
+//         if (index != req.size() - 1)
+//         {
+//             result += ",";
+//         }
 
-        index++;
-    }
+//         index++;
+//     }
 
-    result += "}";
+//     result += "}";
 
-    cout << result << endl;
+//     TLOG_DEBUG( result << endl;);
 
-    return result;
-}
+//     return result;
+// }
 
-int main()
-{
-    {
-        ApiProtocol protocol;
+// int main()
+// {
+//     {
+//         ApiProtocol protocol;
 
-        if (!protocol.init(Get_Goods_Info))
-        {
-            cout << "init failed..." << endl;
-            return 0;
-        }
+//         if (!protocol.init(Get_Goods_Info))
+//         {
+//             TLOG_DEBUG("init failed..." << endl;);
+//             return 0;
+//         }
 
-        vector<string> groups;
-        protocol.getGroups(groups);
+//         vector<string> groups;
+//         protocol.getGroups(groups);
 
-        map<string, string> dataset;
-        dataset["goods_id"] = "G001";
-        dataset["goods_label"] = "食品";
+//         map<string, string> dataset;
+//         dataset["goods_id"] = "G001";
+//         dataset["goods_label"] = "食品";
 
-        cout << "group size: " << groups.size() << endl;
+//         TLOG_DEBUG("group size: " << groups.size() << endl;);
 
-        for (size_t i = 0; i < groups.size(); i++)
-        {
-            string grp_name = groups[i];
-            cout << "main: " << i << "," << grp_name << endl;
+//         for (size_t i = 0; i < groups.size(); i++)
+//         {
+//             string grp_name = groups[i];
+//             TLOG_DEBUG("main: " << i << "," << grp_name << endl;);
 
-            vector<string> requests;
-            protocol.getRequests(grp_name, requests);
+//             vector<string> requests;
+//             protocol.getRequests(grp_name, requests);
 
-            string clientRequest = packGetGoodsInfo();
+//             string clientRequest = packGetGoodsInfo();
+//             TLOG_DEBUG("req: " << clientRequest << endl;);
 
-            for (size_t j = 0; j < requests.size(); j++)
-            {
-                cout << "main: " << i << "," << requests[j] << endl;
-                protocol.packRequest(requests[j], clientRequest, dataset);
-            }
-        }
-    }
+//             for (size_t j = 0; j < requests.size(); j++)
+//             {
+//                 TLOG_DEBUG("main: " << i << "," << requests[j] << endl;);
+//                 protocol.packRequest(requests[j], clientRequest, dataset);
+//             }
+//         }
+//     }
 
-    getchar();
+//     getchar();
 
-    return 0;
-}
+//     return 0;
+// }
